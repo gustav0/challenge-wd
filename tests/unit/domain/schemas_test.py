@@ -1,10 +1,11 @@
+from datetime import datetime, timezone
+
 import pytest
 
 from app.domain.schemas import Notification, Preferences
 from app.infraestructure.db.models import EmailNotificationDetail
 from app.infraestructure.db.models import Notification as NotificationTable
 from app.infraestructure.db.models import Preferences as PreferencesTable
-from app.infraestructure.db.models import SMSNotificationDetail
 
 
 class TestPreferences:
@@ -24,6 +25,7 @@ class TestPreferences:
         assert preferences.location == "New York"
 
 
+future_date: str = "2030-01-01T00:00:00.0Z"
 data = [
     {
         "init": {
@@ -33,7 +35,7 @@ data = [
                 "user_id": "1",
                 "property_id": "1",
                 "notification_type": "email",
-                "scheduled_time_utc": None,
+                "scheduled_time_utc": future_date,
                 "sent": None,
             },
         },
@@ -43,7 +45,7 @@ data = [
                 "user_id": "1",
                 "property_id": "1",
                 "notification_type": "email",
-                "scheduled_time_utc": None,
+                "scheduled_time_utc": future_date,
                 "sent": None,
             },
             "details": None,
@@ -56,7 +58,7 @@ data = [
                 "id": 1,
                 "user_id": "1",
                 "property_id": "1",
-                "scheduled_time_utc": None,
+                "scheduled_time_utc": future_date,
                 "sent": None,
                 "service_response": None,
                 "to_email": "to_email@email.com",
@@ -71,7 +73,7 @@ data = [
                 "id": 1,
                 "user_id": "1",
                 "property_id": "1",
-                "scheduled_time_utc": None,
+                "scheduled_time_utc": future_date,
                 "sent": None,
                 "service_response": None,
                 "notification_type": "email",
@@ -96,6 +98,12 @@ class TestNotification:
 
         notification = Notification.from_orm(record)
         for key, value in data["expected"]["values"].items():
+            if key == "scheduled_time_utc":
+                # Parse date from string
+                value = datetime.strptime(value, "%Y-%m-%dT%H:%M:%S.%fZ").replace(
+                    tzinfo=timezone.utc
+                )
+
             assert getattr(notification, key) == value
 
         if data["expected"]["details"]:
