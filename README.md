@@ -1,16 +1,15 @@
 # Walker & Dunlop Challenge Documentation
-[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
+<a href="https://github.com/psf/black"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg"></a>
 
 ## 1. Architecture Overview
 
 ### 1.1 Microservice Architecture Diagram
-I opted for a hexagonal architecture, enabling careful separation of concerns and the hability to perform changes to the service interaction with other systems in a seamless way. (include other benefits).
+I chose a hexagonal architecture to ensure clear separation of concerns, making the service more maintainale and adaptable. This will allow seamless modifications to the service interaction with other systems and enables easier integration of new technologies.
 
-<details>
-<summary>Expand to see a simple diagram explaining the microservice's architecture.
-</summary>
-![Microservice Architecture Diagram](path/to/your/image.png)
-</details>
+
+See the diagram below:
+
+![Microservice Architecture Diagram](https://i.imgur.com/qeiCLcB.png)
 
 
 ### 1.2 Integration into Existing Services
@@ -83,9 +82,10 @@ Or detached mode
 make run args=-d
 ```
 
+#### And the service should be available via http://127.0.0.1:8000/docs
 
 <details>
-<summary>Docker compose command
+<summary>Alternative docker compose command
 </summary>
 
 ### Initial Setup
@@ -129,10 +129,10 @@ The script will only do the insert if the Preferences table is empty.
 Fetch user action is returning a User schema instance genrated as needed to "simulate" API call to a different microservice. Likewise, property information is generated on demand instead of actually fetcing it from the property management service.
 You can check the logc on the respective adapters.
 
-#### Actual notification dispatched is mocked.
+#### Actual notification dispatch is mocked
 The output can be checked in the celery logs after succesfully scheduling a notification.
 
-```docker compose logs celery -f```****
+```docker compose logs celery -f```
 
 #### FastAPI /docs
-The builting Swagger implementation is good enough to interact with the service endpoints. They are all exposed in the `/docs` path.
+The built-in Swagger implementation is good enough to interact with the service endpoints. They are all exposed in the `/docs` path.
