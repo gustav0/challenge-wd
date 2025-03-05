@@ -29,7 +29,7 @@ As specified in the challenge, existing services expose a REST API we can use fo
 - **Redis**: Used as Celery's result store (not for caching in this setup).
 - **RabbitMQ**: Message broker for Celery task distribution.
 - **Pytest**: Preferred testing framework for Python, ensuring reliable and flexible code testing.
-- **Ruff**: to keep the codebases consistently formatted, and code lint.
+- **Black**: to keep the codebases consistently formatted.
 
 ## 2. Assumptions
 
@@ -43,6 +43,28 @@ You can see a more comprehensive list of commands by running:
 ```bash
 make help
 ```
+### TL;DR
+
+<details>
+<summary> Show
+</summary>
+
+------------
+
+```bash
+git clone https://github.com/gustav0/challenge-wd.git
+cd challenge-wd
+make pull
+make build
+make migrate
+make run
+```
+
+An go to http://127.0.0.1:8000/docs
+
+------------
+</details>
+
 
 ### Initial Setup
 Run each of the following commands in the specified order:
