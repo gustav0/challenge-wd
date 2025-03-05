@@ -115,8 +115,24 @@ make test
 - **Lack of Monitoring**: We have no way to track response times or keep an eye on our dependencies (both internal and external).  
 - **No Retry Mechanism on Failures**: If something fails, it just fails. Celery supports automatic retries with exponential backoff that's relatively easy to setup.  
 - **No Failover for Notification Providers**: If the active provider goes down, we're stuck. It would be great to have a system that can automatically switch to another provider.
+- The notification sourcing logic is quite simple, and most of the details are left for the requester to decide, like the property, secheduled time and message. This could definitely be improved based on real requirements.
 
-## 7. For the reviewer
-Actual notification dispatched is mocked. The output can be checked in the celery logs after succesfully scheduling a notification.
+## 7. Comments for the reviewer
+#### Included files
+Some files like `.env` and `logs/app.log` were included to ease to setup process.
 
-```docker compose logs celery -f```
+#### Initial data
+The script `app/setup.py` only objective is to load 4  user preference entries into the database. Meaning, you can use user ids 1, 2, 3 and 4 from the get go.
+The script will only do the insert if the Preferences table is empty.
+
+#### Mocked User repository and Property management services
+Fetch user action is returning a User schema instance genrated as needed to "simulate" API call to a different microservice. Likewise, property information is generated on demand instead of actually fetcing it from the property management service.
+You can check the logc on the respective adapters.
+
+#### Actual notification dispatched is mocked.
+The output can be checked in the celery logs after succesfully scheduling a notification.
+
+```docker compose logs celery -f```****
+
+#### FastAPI /docs
+The builting Swagger implementation is good enough to interact with the service endpoints. They are all exposed in the `/docs` path.
