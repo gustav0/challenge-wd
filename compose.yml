@@ -1,0 +1,84 @@
+services:
+  postgres:
+    image: postgres
+    container_name: wd.postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres      
+      POSTGRES_DB: postgres
+    ports:    
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U your_user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7.4-alpine
+    container_name: wd.redis
+    ports:
+      - 6379:6379
+    command: >
+      --requirepass redis
+      --bind 0.0.0.0
+      --loglevel warning
+
+  rabbit:
+    container_name: wd.rabbit
+    image: rabbitmq:4-management
+    environment:
+      - RABBITMQ_DEFAULT_VHOST=rabs
+      - RABBITMQ_DEFAULT_USER=rabs
+      - RABBITMQ_DEFAULT_PASS=rabs
+    ports:
+      - 5672:5672
+      - 15672:15672
+
+  _base: &base
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    image: wd-python:latest
+    env_file:
+      - .env
+    volumes:
+      - .:/opt/code
+      - /opt/code/.venv
+
+  api:
+    <<: *base
+    container_name: wd.api
+    ports:
+      - 8000:8000
+    depends_on:
+      - postgres
+      - redis
+      - rabbit
+    entrypoint: ["fastapi", "dev", "app/entrypoint/rest_api/main.py"]
+    command: ["--host", "0.0.0.0"]
+
+    
+  celery:
+    <<: *base
+    container_name: wd.celery
+    depends_on:
+      - postgres
+      - redis
+      - rabbit
+    entrypoint: ["celery", "-A", "app.infraestructure.celery", "worker"]
+    command: ["-l", "info"]
+    
+  test:
+    <<: *base
+    container_name: wd.test
+    entrypoint: ["pytest"]
+    network_mode: none
+
+  alembic:
+    <<: *base
+    entrypoint: ["alembic"]
+    depends_on:
+      postgres:
+        condition: service_healthy
